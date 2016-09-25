@@ -90,11 +90,11 @@ Testing Stuff
 # Steps per minut (should be between 80-190)
 stepRate = 100
 # Time window to test
-timeInMiliseconds = 50000
-x = range(0, timeInMiliseconds)
+timeInMilliseconds = 50000
+x = range(0, timeInMilliseconds)
 noisless = map(lambda x: np.sin(((x * 10) / np.pi) * (1 / 1000) * (stepRate / 60)), x)
 
-for i in range(0, timeInMiliseconds):
+for i in range(0, timeInMilliseconds):
     detectSteps(x[i], [noisless[i]])
 
 print('Noiseless: ', stepCount)
@@ -104,7 +104,7 @@ stepCount = 0
 noise = 0.10
 rands = [((noise * np.random.rand()) - (noise / 2)) for i in range(0, len(x))]
 
-for i in range(0, timeInMiliseconds):
+for i in range(0, timeInMilliseconds):
     detectSteps(x[i], [noisless[i]+ rands[i]])
 
 print('Noise: ', stepCount)
@@ -112,7 +112,7 @@ print('Noise: ', stepCount)
 if stepRate < 80 or stepRate > 190:
     print('Projected Step Count: ', 0)
 else:
-    print('Projected Step Count: ', (timeInMiliseconds / 1000) * (stepRate / 60))
+    print('Projected Step Count: ', (timeInMilliseconds / 1000) * (stepRate / 60))
 import matplotlib.pyplot as plt
 
 plt.plot(x, noisless)
