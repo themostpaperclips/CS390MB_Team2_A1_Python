@@ -1,12 +1,18 @@
+from __future__ import division
 import numpy as np
 
+
+# Copy/paste stuff
 count = 0
 average = 0
 side = 0
 latest = 0
 
+stepCount = 0
+
 def onStepDetected(timestamp):
-    print("Ping")
+    global stepCount
+    stepCount += 1
 
 def detectSteps(timestamp, filteredValues):
     """
@@ -55,6 +61,31 @@ def detectSteps(timestamp, filteredValues):
 
     return
 
+# Testing stuff
+stepRate = 100
+timeInMiliseconds = 50000
+x = range(0, timeInMiliseconds)
+noisless = map(lambda x: np.sin(((x * 10) / np.pi) * (1 / 1000) * (stepRate / 60)), x)
 
-for i in range(0, 100000):
-    detectSteps(i, [np.sin(i / 100)])
+for i in range(0, timeInMiliseconds):
+    detectSteps(x[i], [noisless[i]])
+
+print('Noiseless: ', stepCount)
+
+stepCount = 0
+
+noise = 0.10
+rands = [((noise * np.random.rand()) - (noise / 2)) for i in range(0, len(x))]
+
+for i in range(0, timeInMiliseconds):
+    detectSteps(x[i], [noisless[i]+ rands[i]])
+
+print('Noise: ', stepCount)
+
+print('Projected Step Count: ', (timeInMiliseconds / 1000) * (stepRate / 60))
+import matplotlib.pyplot as plt
+
+plt.plot(x, noisless)
+plt.plot(x, [noisless[i] + rands[i] for i in range(0, len(x))])
+
+plt.show()
