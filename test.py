@@ -62,7 +62,7 @@ def detectSteps(timestamp, filteredValues):
     return
 
 # Testing stuff
-stepRate = 100
+stepRate = 200
 timeInMiliseconds = 50000
 x = range(0, timeInMiliseconds)
 noisless = map(lambda x: np.sin(((x * 10) / np.pi) * (1 / 1000) * (stepRate / 60)), x)
@@ -82,7 +82,10 @@ for i in range(0, timeInMiliseconds):
 
 print('Noise: ', stepCount)
 
-print('Projected Step Count: ', (timeInMiliseconds / 1000) * (stepRate / 60))
+if stepRate < 80 or stepRate > 190:
+    print('Projected Step Count: ', 0)
+else:
+    print('Projected Step Count: ', (timeInMiliseconds / 1000) * (stepRate / 60))
 import matplotlib.pyplot as plt
 
 plt.plot(x, noisless)
