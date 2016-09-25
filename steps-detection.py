@@ -41,6 +41,11 @@ def onStepDetected(timestamp):
     """
     send_socket.send(json.dumps({'user_id' : user_id, 'sensor_type' : 'SENSOR_SERVER_MESSAGE', 'message' : 'SENSOR_STEP', 'data': {'timestamp' : timestamp}}) + "\n")
 
+count = 0
+average = 0
+side = 0
+latest = 0
+
 def detectSteps(timestamp, filteredValues):
     """
     Accelerometer-based step detection algorithm.
@@ -53,7 +58,34 @@ def detectSteps(timestamp, filteredValues):
     in the timestamp.
     """
 
-    # TODO: Step detection algorithm
+    global count
+    global average
+    global side
+    global latest
+
+    combined = sum(map(lambda x: x ** 2, filteredValues)) ** 0.5
+
+    count += 1
+    average += (combined / count)
+
+    if (combined != average) and side == 0:
+        if combined > average:
+            side = 1
+        else:
+            side = -1
+
+    if (combined >= average) and side < 0:
+        if ((timestamp - latest) < 750) and ((timestamp - latest) > 315):
+            onStepDetected(timestamp)
+        latest = timestamp
+        side *= (-1)
+
+    if (combined <= average) and side > 0:
+        if ((timestamp - latest) < 750) and ((timestamp - latest) > 315):
+            onStepDetected(timestamp)
+        latest = timestamp
+        side *= (-1)
+
     return
 
 
