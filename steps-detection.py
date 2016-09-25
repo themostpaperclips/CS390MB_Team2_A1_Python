@@ -41,9 +41,13 @@ def onStepDetected(timestamp):
     """
     send_socket.send(json.dumps({'user_id' : user_id, 'sensor_type' : 'SENSOR_SERVER_MESSAGE', 'message' : 'SENSOR_STEP', 'data': {'timestamp' : timestamp}}) + "\n")
 
+# How many data points
 count = 0
+# Average of all values, used to determine 0 crossing
 average = 0
+# The side of the average the last point was on
 side = 0
+# The time stamp of the most recent 0 crossing
 latest = 0
 
 def detectSteps(timestamp, filteredValues):
@@ -58,31 +62,50 @@ def detectSteps(timestamp, filteredValues):
     in the timestamp.
     """
 
+    # Reference global variables
     global count
     global average
     global side
     global latest
 
-    combined = sum(map(lambda x: x ** 2, filteredValues)) ** 0.5
+    # Sum of squares of each direction, preserving negatives
+    combined = sum(map(lambda x: x * abs(x), filteredValues))
 
+    # Square root of combined, preserving negatives
+    if combined < 0:
+        combined = -1 * (abs(combined) ** 0.5)
+    else:
+        combined = combined ** 0.5
+
+    # Multiply the average by the count to add this point to the average
+    newSum = average * count
+    # Increment the count
     count += 1
-    average += (combined / count)
+    # Calculate the new average
+    average = ((newSum + combined) / count)
 
+    # This initializes the side variable by putting it on one side at first
     if (combined != average) and side == 0:
         if combined > average:
             side = 1
         else:
             side = -1
 
+    # If the current point is greater than the average and the last one was less
     if (combined >= average) and side < 0:
+        # If the difference between this 0-crossing and the last one is in the step range
         if ((timestamp - latest) < 750) and ((timestamp - latest) > 315):
             onStepDetected(timestamp)
+        # Update the latest 0-crossing and side
         latest = timestamp
         side *= (-1)
 
+    # If the current point is less than the average and the last one was greater
     if (combined <= average) and side > 0:
+        # If the difference between this 0-crossing and the last one is in the step range
         if ((timestamp - latest) < 750) and ((timestamp - latest) > 315):
             onStepDetected(timestamp)
+        # Update the latest 0-crossing and side
         latest = timestamp
         side *= (-1)
 
