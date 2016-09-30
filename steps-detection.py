@@ -22,7 +22,7 @@ import threading
 import numpy as np
 
 # TODO: Replace the string with your user ID
-user_id = "-1"
+user_id = "be.af.9a.d0.e9.3f.e3.db.8f.94"
 
 count = 0
 
